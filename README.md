@@ -1,10 +1,6 @@
 # app
 vue仿写美团外卖App
 ***
-# 前言
-***
-此项目是JavaScript学习过程中的练习作业。
-
 # 技术栈
 ***
 Vue + Webpack + mokejs + axios + JavaScript +ES6 + css + css3 + html
