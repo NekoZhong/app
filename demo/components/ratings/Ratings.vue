@@ -28,7 +28,7 @@
         </div>
       </div>
 
-      <app-split></app-split>
+      <Split></Split>
 
       <div class="content">
         <div class="rating-select" v-if="ratings.tab">
@@ -48,8 +48,8 @@
             class="item" 
             :class="{'active':selectType==0}"
             @click="selectTypeFn(0)">
-            <img v-show="selectType != 0" src="../assets/img/icon_sub_tab_dp_normal@2x.png"/>
-            <img v-show="selectType == 0" src="../assets/img/icon_sub_tab_dp_highlighted@2x.png"/>
+            <img v-show="selectType != 0" src="./img/icon_sub_tab_dp_normal@2x.png"/>
+            <img v-show="selectType == 0" src="./img/icon_sub_tab_dp_highlighted@2x.png"/>
             {{ratings.tab[2].comment_score_title}}
           </span>
         </div>
@@ -73,14 +73,14 @@
               >
               <div class="comment-header">
                 <img :src="comment.user_pic_url" v-if="comment.user_pic_url" />
-                <img src="../assets/img/anonymity.png" v-if="!comment.user_pic_url"  />
+                <img src="./img/anonymity.png" v-if="!comment.user_pic_url"  />
               </div>
               <div class="comment-main">
                 <div class="user">
                   {{comment.user_name}}
                 </div>
                 <div class="time">
-                  {{formatDate(comment.comment_time)}}                  
+                  {{formatDate(comment.comment_time)}}
                 </div>
                 <div class="star-wrapper">
                   <span class="text">评分</span>
@@ -92,16 +92,15 @@
               </div>
             </li>
         </ul>
-			</div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import BScroll from 'better-scroll'
-import Split from './Split'
-import Star from './Star'
+import Split from '../split/Split'
+import Star from '../star/Star'
 
 const ALL = 2
 const PICTURE = 1
@@ -114,18 +113,18 @@ export default {
     }
   },
   components:{
-    "app-split":Split,
+    Split,
     Star
-	},
-  
+  },
   created(){
-    axios.get('/data/ratings')
-    .then(res => {
-      // console.log(res.data.data)
-      if(res.data.data.code===0){
-      this.ratings = res.data.data.data;
-      console.log(this.ratings)
-      this.$nextTick(()=>{
+    fetch("/api/ratings")
+      .then(res => {
+        return res.json()
+      })
+      .then(response =>{
+        if(response.code == 0){
+          this.ratings = response.data
+          this.$nextTick(()=>{
             if(!this.scroll){
               this.scroll = new BScroll(this.$refs.ratingView,{
                 click:true
@@ -133,17 +132,15 @@ export default {
             }else{
               this.scroll.refresh()
             }
-          })  
-      }
-     
-    })
+          })
+        }
+      })
   },
   methods:{
     selectTypeFn(type){
-			this.selectType = type;
-			console.log(this.selectType)
-		},
-		formatDate(time){
+      this.selectType = type
+    },
+    formatDate(time){
         let date = new Date(time * 1000);
 				let fmt = 'yyyy.MM.dd';
 				if(/(y+)/.test(fmt)) { // 年
@@ -170,7 +167,7 @@ export default {
   computed:{
     selectComments(){
       if(this.selectType == ALL){
-				return this.ratings.comments
+        return this.ratings.comments
       }else if(this.selectType == PICTURE){
         let arr = []
 
@@ -179,12 +176,11 @@ export default {
             arr.push(comment)
           }
         });
-				return arr
-				
+        return arr
       }else{
         return this.ratings.comments_dp.comments
       }
-		}
+    }
   }
 }
 </script>
@@ -211,7 +207,7 @@ export default {
 	
 	.ratings .ratings-wrapper .overview .overview-left .comment-score {
 		float: left;
-		width: 54px;
+		width: 48px;
 		text-align: center;
 		margin-right: 26px;
 	}

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <app-header :shopIn="shopInf"></app-header>
-    <app-nav></app-nav>
+    <app-nav :commentNum="commentNum"></app-nav>
     <router-view></router-view>
   </div>
 </template>
@@ -15,7 +15,8 @@ export default {
   name: 'App',
   data(){
     return {
-      shopInf:{}
+      shopInf:{},
+      commentNum:0
     }
   },
  components:{
@@ -25,10 +26,18 @@ export default {
   created(){
     axios.get('/data/goods')
     .then(res => {
-      console.log(res.data.data)
+      // console.log(res.data.data)
       if(res.data.data.code===0){
       this.shopInf = res.data.data.data.poi_info;
-      console.log(this.shopInf)
+      // console.log(this.shopInf)       
+      }  
+    })
+    axios.get('/data/ratings')
+    .then(res => {
+      // console.log(res.data.data)
+      if(res.data.data.code===0){
+      this.commentNum = res.data.data.data.comment_num;
+      console.log(this.commentNum)
         
       }
      

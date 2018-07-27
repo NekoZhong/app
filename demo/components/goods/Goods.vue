@@ -4,25 +4,32 @@
     <div class="menu-wrapper" ref="menuScroll">
       <ul>
         <!-- 专场 -->
-        <li class="menu-item" :class="{'current':currentIndex === 0}" @click="selectMenu(0)">
+        <li 
+          class="menu-item" 
+          :class="{'current':currentIndex === 0}"
+          @click="selectMenu(0)">
           <p class="text">
             <img class="icon" :src="container.tag_icon" v-if="container.tag_icon">
             {{container.tag_name}}
           </p>
         </li>
 
-        <li class="menu-item" :class="{'current':currentIndex === index + 1}" v-for="(item,index) in goods" :key="index" @click="selectMenu(index+1)">
+        <li 
+            class="menu-item" 
+            :class="{'current':currentIndex === index + 1}" 
+            v-for="(item,index) in goods" :key="index"
+            @click="selectMenu(index+1)"
+            >
           <p class="text">
             <img class="icon" :src="item.icon" v-if="item.icon">
             {{item.name}}
           </p>
           <i class="num" v-show="calculateCount(item.spus)">
             {{calculateCount(item.spus)}}
-          </i>     
+          </i>
         </li>
       </ul>
     </div>
-
     <!-- 商品列表 -->
     <div class="foods-wrapper" ref="foodScroll">
       <ul>
@@ -38,7 +45,11 @@
 
           <!-- 具体的商品列表 -->
           <ul>
-            <li v-for="(food,index) in item.spus" :key="index" class="food-item" @click="showDetail(food)">
+            <li 
+              v-for="(food,index) in item.spus" 
+              :key="index" 
+              @click="showDetail(food)"
+              class="food-item">
               <div class="icon" :style="head_bg(food.picture)"></div>
               <div class="content">
                 <h3 class="name">{{food.name}}</h3>
@@ -49,67 +60,61 @@
                 </div>
                 <img class="product" :src="food.product_label_picture" alt="">
                 <p class="price">
-                  <span class="text">￥{{food.min_price}}</span>
+                  <span class="text">${{food.min_price}}</span>
                   <span class="unit">/{{food.unit}}</span>
                 </p>
               </div>
-              <div class="carcontrol-wrapper">
-                <app-car-control :food="food"></app-car-control>
+              <div class="cartcontrol-wrapper">
+                <app-cart-control :food="food"></app-cart-control>
               </div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
-    <app-shopcar :poiInfo="poiInfo" :selectFoods="selectFoods"></app-shopcar>
-    
-    <!-- 商品详情 -->
-    <app-product-detail :food="selectFood" ref="foodView"></app-product-detail>    
-  </div>
 
-  
+    <!-- 购物车 -->
+    <app-shopcart :poiInfo="poiInfo" :selectFoods="selectFoods"></app-shopcart>
+
+    <!-- 商品详情 -->
+    <app-product-detail :food="selectFood" ref="foodView"></app-product-detail>
+  </div>
 </template>
 
 <script>
-import axios from 'axios'
 import BScroll from 'better-scroll'
-import ShopCar from './ShopCar'
-import CarControl from './CarControl'
-import ProductDetail from './ProductDetail'
+import Shopcart from '../shopcart/Shopcart'
+import CartControl from '../cartcontrol/CartControl'
+import ProductDetail from '../productDetail/ProductDetail'
 export default {
-  data () {
+  data(){
     return {
-     container:{},
-     goods:[],
-     poiInfo:{},   
-     menuScroll:{},
-     foodScroll:{},
-     scrollY:0,
-     listHeight:[],
-     selectFood:{}
+      container:{},
+      goods:[],
+      poiInfo:{},
+      listHeight:[],
+      menuScroll:{},
+      foodScroll:{},
+      scrollY:0,
+      selectFood:{}
     }
   },
-  components:{
-    "app-shopcar":ShopCar,
-    "app-car-control":CarControl,
-    "app-product-detail":ProductDetail
-  },
+  // 计算属性是不能够接收参数的
   methods:{
     head_bg(imgName){
       return "background-image: url(" + imgName + ");"
     },
     initScroll(){
-      this.menuScroll = new BScroll(this.$refs.menuScroll,{
-        click:true
-      })
+      this.menuScroll = new BScroll(this.$refs.menuScroll)
       this.foodScroll = new BScroll(this.$refs.foodScroll,{
         probeType:3,
         click:true
       })
 
+      // foodScroll 监听事件
       this.foodScroll.on("scroll",(pos) => {
         // console.log(pos.y)
-      this.scrollY = Math.abs(Math.round(pos.y))
+        this.scrollY = Math.abs(Math.round(pos.y))
         // console.log(this.scrollY)
       })
     },
@@ -118,8 +123,8 @@ export default {
       let foodlist = this.$refs.foodScroll.getElementsByClassName("food-list-hook")
       // console.log(foodlist)
 
-      let height = 0;
-      this.listHeight.push(height);
+      let height = 0
+      this.listHeight.push(height)
 
       for(let i = 0; i < foodlist.length; i++){
         let item = foodlist[i]
@@ -130,7 +135,7 @@ export default {
       // console.log(this.listHeight)
     },
     selectMenu(index){
-      console.log(index)
+      // console.log(index)
       let foodlist = this.$refs.foodScroll.getElementsByClassName("food-list-hook")
       let element = foodlist[index]
       // console.log(element)
@@ -148,29 +153,34 @@ export default {
     },
     showDetail(food){
       this.selectFood = food
+
       this.$refs.foodView.showView()
     }
   },
-   created(){
-    axios.get('/data/goods')
-    .then(res => {
-      if(res.data.data.code===0){
-      this.container = res.data.data.data.container_operation_source;
-      this.goods = res.data.data.data.food_spu_tags;
-      this.poiInfo =  res.data.data.data.poi_info;
+  created(){
+    fetch("/api/goods")
+      .then(res => {
+        return res.json()
+      })
+      .then(response =>{
+        if(response.code == 0){
+          this.container = response.data.container_operation_source
+          this.goods = response.data.food_spu_tags
+          this.poiInfo = response.data.poi_info
 
-       this.$nextTick(() => {
+          // DOM已经更新
+          this.$nextTick(() => {
             // 执行滚动方法
-            this.initScroll();
+            this.initScroll()
 
             // 计算分类的区间高度
-            this.calculateHeight();
+            this.calculateHeight()
             // 监听滚动的位置
             // 根据滚动位置确认下标,与左侧对应
             // 通过下标实现点击左侧,滚动右侧
           })
-      }
-    })  
+        }
+      })
   },
   computed:{
     currentIndex(){
@@ -183,7 +193,6 @@ export default {
         if(!height2 || (this.scrollY >= height1 && this.scrollY < height2)){
           // console.log(i)
           return i;
-
         }
       }
       return 0
@@ -200,13 +209,17 @@ export default {
 
       return foods
     }
+  },
+  components:{
+    "app-shopcart":Shopcart,
+    "app-cart-control":CartControl,
+    "app-product-detail":ProductDetail
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
- .goods{
+.goods{
   display: flex;
   position: absolute;
   top: 190px;
@@ -259,7 +272,8 @@ export default {
 	width: 100%;
 	margin-bottom: 11px;
 	border-radius: 5px;
-} 
+}
+
 /* 具体分类商品布局 */ 
 .goods .foods-wrapper .food-list{
 	padding: 11px;
@@ -270,7 +284,7 @@ export default {
 .goods .foods-wrapper .food-list .title{
 	height: 13px;
 	font-size: 13px;
-	background: url(../assets/img/btn_yellow_highlighted@2x.png) no-repeat left center;
+	background: url(./img/btn_yellow_highlighted@2x.png) no-repeat left center;
 	background-size: 2px 10px;
 	padding-left: 7px;
 	margin-bottom: 12px;
@@ -352,7 +366,7 @@ export default {
 	margin-top: 1px;
 }
 
-.goods .foods-wrapper .food-list .food-item .carcontrol-wrapper{
+.goods .foods-wrapper .food-list .food-item .cartcontrol-wrapper{
 	position: absolute;
 	right: 0;
 	bottom: 0;
@@ -371,4 +385,5 @@ export default {
 	font-size: 7px;
 	line-height: 13px;
 }
+
 </style>

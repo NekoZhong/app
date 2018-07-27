@@ -1,10 +1,10 @@
 <template>
 	<div class="carcontrol">
         <transition name="move">
-			<div class="car-decrease icon-remove_circle_outline" @click="decrease" v-show="food.count"></div>
+			<div class="car-decrease icon-remove_circle_outline" @click.stop.prevent="decrease" v-show="food.count"></div>
         </transition>
         <div class="car-count" v-show="food.count">{{food.count}}</div>
-        <div class="car-add icon-add_circle" @click="add">
+        <div class="car-add icon-add_circle" @click.stop.prevent="add">
             <i class="bg"></i>
         </div>
 	</div>

@@ -1,7 +1,7 @@
 <template>
   <div class="nav">
     <router-link to="/goods" class="nav-item">点餐<i class="line"></i></router-link>
-    <router-link to="/ratings" class="nav-item">评价<i class="line"></i></router-link>
+    <router-link to="/ratings" class="nav-item">评价({{commentNum}})<i class="line"></i></router-link>
     <router-link to="/seller" class="nav-item">商家<i class="line"></i></router-link>
   </div>
 </template>
@@ -13,6 +13,12 @@ export default {
     return {
      
     }
+  },
+  props:{
+      commentNum:{
+          type:Number,
+          default:0
+      }
   }
 }
 </script>
