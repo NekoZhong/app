@@ -12,3 +12,4 @@ Vue + Webpack + mokejs + axios + JavaScript +ES6 + css + css3 + html
 # 效果演示图
 ***
  ![demo](https://github.com/NekoZhong/app/blob/master/my-app.gif)
+![demo](https://github.com/NekoZhong/app/blob/master/app.gif)
